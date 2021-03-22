@@ -126,7 +126,7 @@
     //spatialJoin identifies desired features within the defined search area
     function spatialJoin(sourceLayer, filterFeature) {
       // Need this line to specify the array since map.getSource in the click event doesn't do this.
-      sourceGeoJSON = map.querySourceFeatures(sourceLayer);
+      sourceGeoJSON = map.querySourceFeatures(sourceLayer); //I changed the input name from "SourceGeoJSON" to "sourceLayer"
       // Loop through all the features in the source geojson and return the ones that
       // are inside the filter feature (buffered radius) and are confirmed free standing sites
       var joined = sourceGeoJSON.features.filter(function (feature) { //what is this feature object doing?
