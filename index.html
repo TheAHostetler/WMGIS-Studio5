@@ -41,7 +41,7 @@
   </div>
   <script>
     // Data showing water points - replace the dummy URL with your own.
-    var url = 'https://raw.githubusercontent.com/TheAHostetler/WMGIS-Studio5/master/data/OSM_Zaatari_H20_RAW.geojson?token=AQ3VE6YRCD364PERKCVUC5LAJJJQM'
+    var url = 'https://raw.githubusercontent.com/TheAHostetler/WMGIS-Studio5/master/data/OSM_Zaatari_H20.geojson'
 
 
     mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hcHBlciIsImEiOiJnZ0FDZWJrIn0.9Vck8ZXqJsSYGAYhKwLsWA';
@@ -55,13 +55,86 @@
     map.on('load', function () {
 
       // Map layers go here!
+      map.addLayer({
+        id: 'OSM-water',
+        source: {
+          type: 'geojson',
+          data: url
+        },
+        type: 'circle',
+        paint: {
+          'circle-color': '#83e8fc',
+          'circle-radius': 3,
+          'circle-opacity': 1,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#0557fa',
+        }
+      });
+
+      // When the map has finished loading, add a new layer that will be empty
+      // at first, but will eventually house our confirmed water sites.
+      map.addLayer({
+        id: 'selected-water',
+        source: {
+          type: 'geojson',
+          data: { "type": "FeatureCollection", "features": [] }
+        },
+        type: 'circle',
+        paint: {
+          'circle-color': 'red',
+          'circle-radius': 3
+           }
+      });
+
+      // Draw the search radius on the map
+      map.addLayer({
+        id: 'search-radius',
+        source: {
+          type: 'geojson',
+          data: { "type": "FeatureCollection", "features": [] }
+        },
+        type: 'fill',
+        paint: {
+          'fill-color': '#fcf683',
+          'fill-opacity': 0.5
+        }
+      });
+
+      //Click event captures lat long at click location
+      map.on('click', function(e) {
+        var eventLngLat = [e.lngLat.lng, e.lngLat.lat];
+        // this line works and has been commented out // console.log(eventLngLat)
+        // this creates the search area
+        var searchRadius = makeRadius (eventLngLat, 500);
+        // this adds the search area polygon to the map
+        map.getSource('search-radius').setData(searchRadius);
+        // This filters features that match search criteria
+        var featuresInBuffer = spatialJoin('OSM-water', searchRadius);
+        //This adds sets an existing layer to display the filtered features
+        map.getSource('selected-water').setData(turf.featureCollection(featuresInBuffer));
+      });
+
     });
 
-    //Click event goes here!
+    //makeRadius function to create a defined search area around the clicked point
+    function makeRadius (lngLatArray, radiusInMeters){
+      var point = turf.point(lngLatArray)
+      var buffered = turf.buffer(point, radiusInMeters, { units: 'meters'});
+      return buffered;
+    };
 
-    //makeRadius function goes here!
+    //spatialJoin identifies desired features within the defined search area
+    function spatialJoin(sourceLayer, filterFeature) {
+      // Need this line to specify the array since map.getSource in the click event doesn't do this.
+      sourceGeoJSON = map.querySourceFeatures(sourceLayer);
+      // Loop through all the features in the source geojson and return the ones that
+      // are inside the filter feature (buffered radius) and are confirmed free standing sites
+      var joined = sourceGeoJSON.features.filter(function (feature) { //what is this feature object doing?
+        return turf.booleanPointInPolygon(feature, filterFeature) && feature.properties.type === 'Free_standing';
+      });
 
-    //spatialJoin function goes here!
+    return joined;
+  };
 
   </script>
 
