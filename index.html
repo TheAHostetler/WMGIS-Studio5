@@ -123,35 +123,7 @@
       return buffered;
     };
 
-/* This is the direction from the tutorial
-    function spatialJoin(sourceGeoJSON, filterFeature) {
-      // Need this line to specify the array since map.getSource in the click event doesn't do this.
-      sourceGeoJSON = map.querySourceFeatures(sourceLayer);
-      // Loop through all the features in the source geojson and return the ones that
-      // are inside the filter feature (buffered radius) and are confirmed free standing sites
-      var joined = sourceGeoJSON.features.filter(function (feature) {
-        return turf.booleanPointInPolygon(feature, filterFeature) && feature.properties.type === 'Free_standing';
-      });
 
-      return joined;
-    }
-
-    //These are the changes I tried to make
-    //spatialJoin identifies desired features within the defined search area
-    function spatialJoin(sourceLayer, filterFeature) {
-      // Need this line to specify the array since map.getSource in the click event doesn't do this.
-      sourceGeoJSON = map.querySourceFeatures(sourceLayer); //I changed the input name from "SourceGeoJSON" to "sourceLayer"
-      // Loop through all the features in the source geojson and return the ones that
-      // are inside the filter feature (buffered radius) and are confirmed free standing sites
-      var joined = sourceGeoJSON.features.filter(function (feature) { //what is this feature object doing?
-        return turf.booleanPointInPolygon(feature, filterFeature) && feature.properties.type === 'Free_standing';
-      });
-
-    return joined;
-  };
-*/
-
-//This is from the sample tutorial product
 //spatialJoin function goes here!
 function spatialJoin(sourceLayer, filterFeature) {
   // This should work as long as you are querying features within or near the viewport.
